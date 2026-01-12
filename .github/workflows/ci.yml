@@ -48,5 +48,6 @@ jobs:
         git config user.name "self-healing-agent"
         git config user.email "agent@github.com"
         git add app.py
+        # Only commit if there are changes
         git diff --cached --quiet || git commit -m "AI: Auto-healed application after failure"
-        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+        git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" HEAD:main
