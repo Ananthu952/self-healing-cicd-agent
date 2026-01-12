@@ -23,14 +23,21 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-- name: Run application and capture error
-  run: |
-    python app.py 2> error.log || true
+    - name: Run application and capture error
+      run: |
+        python app.py 2> error.log || true
 
+    - name: Show captured error (for debugging)
+      run: |
+        cat error.log
 
     - name: Run Self-Healing Agent
       run: |
         python apply_patch.py
+
+    - name: Show app.py after patch
+      run: |
+        cat app.py
 
     - name: Commit healed code
       run: |
@@ -38,4 +45,4 @@ jobs:
         git config user.email "agent@github.com"
         git add app.py
         git commit -m "AI: Auto-healed application after failure" || echo "No changes to commit"
-        git push
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main
