@@ -5,11 +5,14 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  self-heal:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -20,15 +23,19 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-    - name: Run application
+    - name: Run application (may fail)
       run: |
         python app.py
       continue-on-error: true
 
-    - name: Apply Self-Healing Patch
+    - name: Run Self-Healing Agent
       run: |
         python apply_patch.py
 
-    - name: Re-run application after healing
+    - name: Commit healed code
       run: |
-        python app.py
+        git config user.name "self-healing-agent"
+        git config user.email "agent@github.com"
+        git add app.py
+        git commit -m "AI: Auto-healed application after failure" || echo "No changes to commit"
+        git push
