@@ -1,4 +1,4 @@
-name: Python CI Pipeline
+name: Self-Healing CI Pipeline
 
 on:
   push:
@@ -9,18 +9,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.10'
 
     - name: Install dependencies
       run: |
-        pip install -r requirements.txt || true
+        pip install -r requirements.txt
 
     - name: Run application
+      run: |
+        python app.py
+      continue-on-error: true
+
+    - name: Apply Self-Healing Patch
+      run: |
+        python apply_patch.py
+
+    - name: Re-run application after healing
       run: |
         python app.py
