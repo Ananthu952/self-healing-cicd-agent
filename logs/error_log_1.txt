@@ -1,0 +1,2 @@
+print(undefined_variable)
+NameError: name 'undefined_variable' is not defined
